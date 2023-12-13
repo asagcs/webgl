@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <script src="../lib/index.js"></script>
+    </head>
+    <body>
+        <canvas id="canvas" width="400" height="400">
+            此浏览器不支持canvas
+        </canvas>
+        
+        <script>
+            const ctx = document.getElementById('canvas');
+            const gl = ctx.getContext("webgl");
+
+            // 着色器
+            // 创建着色器源码
+            const VERTEX_SHADER_SOURCE = `
+                attribute vec4 aPosition;
+                void main() {
+                    gl_Position = aPosition;
+                    gl_PointSize = 30.0;
+                }
+            `;
+            const FRAGMENT_SHADER_SOURCE = `
+                precision mediump float;
+                uniform vec2 u_FragColor;
+                void main() {
+                    gl_FragColor = vec4(u_FragColor.r, u_FragColor.g, 0.0, 1.0);
+                }
+            `;
+
+            const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+
+            const aPosition = gl.getAttribLocation(program, 'aPosition');
+            const aColor = gl.getUniformLocation(program, 'u_FragColor');
+            // gl.uniform4f(aColor, 1.0, 0.0, 0.0, 1.0);
+            gl.uniform2f(aColor, 1.0, 0.0);
+            // gl.vertexAttrib4f(aPosition, 0.5, 0.5, 0.0, 1.0);
+            // gl.vertexAttrib3f(aPosition, 0.5, 0.5, 0.0);
+            // gl.vertexAttrib2f(aPosition, 0.5, 0.5);
+            // gl.vertexAttrib1f(aPosition, 0.5);
+
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            const points = [];
+            ctx.onclick = function(ev) {
+                const x = ev.clientX;
+                const y = ev.clientY;
+
+                const domPosition = ev.target.getBoundingClientRect();
+
+                const domX = x - domPosition.left;
+                const domY = y - domPosition.top;
+
+                const halfWidth = ctx.offsetWidth / 2;
+                const halfHeight = ctx.offsetHeight / 2;
+
+                const clickX = (domX - halfWidth) / halfWidth;
+                const clickY = (halfHeight - domY) / halfHeight;
+                // gl.clearColor(0.0, 0.0, 0.0, 1.0);
+                // gl.clear(gl.COLOR_BUFFER_BIT);
+                // gl.vertexAttrib2f(aPosition, clickX, clickY);
+                // gl.drawArrays(gl.POINTS, 0, 1);
+                points.push({clickX, clickY});
+
+                for(let i = 0; i < points.length; i++) {
+                    gl.vertexAttrib2f(aPosition, points[i].clickX, points[i].clickY);
+                    gl.uniform2f(aColor, points[i].clickX, points[i].clickY);
+                    gl.drawArrays(gl.POINTS, 0, 1);
+                }
+                
+
+            }
+            
+        </script>
+    </body>
+</html>

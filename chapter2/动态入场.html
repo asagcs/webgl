@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <script src="../lib/index.js"></script>
+        <style>
+        </style>
+    </head>
+    <body>
+        <canvas id="canvas" width="400" height="400">
+            此浏览器不支持canvas
+        </canvas>
+        
+        <script>
+            const ctx = document.getElementById('canvas');
+            const gl = ctx.getContext("webgl");
+
+            // 着色器
+            // 创建着色器源码
+            const VERTEX_SHADER_SOURCE = `
+                attribute vec4 aPosition;
+                void main() {
+                    gl_Position = aPosition;
+                    gl_PointSize = 10.0;
+                }
+            `;
+            const FRAGMENT_SHADER_SOURCE = `
+                precision lowp float;
+                uniform float uOpacity;
+                void main() {
+                    gl_FragColor = vec4(1.0, 0.0, 0.0, uOpacity);
+                }
+            `;
+
+            const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+
+            const aPosition = gl.getAttribLocation(program, 'aPosition');
+            const uOpacity = gl.getUniformLocation(program, 'uOpacity');
+
+            const points = new Float32Array([
+                -1.0, -1.0,
+                1.0, -1.0,
+                -1.0, 1.0, 
+                1.0, 1.0
+            ]);
+
+            const buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+
+            gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(aPosition);
+
+            let value = 0;
+            function run() {
+                value += 0.01;
+
+                gl.uniform1f(uOpacity, value);
+                gl.drawArrays(gl.TRIANGLE_STRIP,0, 4)
+                requestAnimationFrame(run);
+            } 
+            run();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,22 @@
+!<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <canvas id="canvas" width="400" height="400">
+            此浏览器不支持canvas
+        </canvas>
+        
+        <script>
+            const ctx = document.getElementById('canvas');
+            const c = ctx.getContext("2d");
+            c.fillStyle = "red";
+            c.fillRect(10, 10, 100, 100);
+        </script>
+    </body>
+</html>

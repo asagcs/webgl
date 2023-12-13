@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <script src="../lib/index.js"></script>
+    </head>
+    <body>
+        <canvas id="canvas" width="400" height="400">
+            此浏览器不支持canvas
+        </canvas>
+        
+        <script>
+            const ctx = document.getElementById('canvas');
+            const gl = ctx.getContext("webgl");
+
+            // 着色器
+            // 创建着色器源码
+            const VERTEX_SHADER_SOURCE = `
+                attribute vec4 aPosition;
+                void main() {
+                    gl_Position = aPosition;
+                }
+            `;
+            const FRAGMENT_SHADER_SOURCE = `
+                precision lowp float;
+                uniform vec3 metaBalls[2];
+
+                void main() {
+                    float x = gl_FragCoord.x;
+                    float y = gl_FragCoord.y;
+
+                    float v = 0.0;
+
+                    for(int i = 0; i < 2; i ++) {
+                        vec3 m = metaBalls[i];
+                        float dx = m.x - x;
+                        float dy = m.y - y;
+                        float r = m.z;
+                        v += r * r / (dx * dx + dy * dy);
+                    }
+
+                    vec4 color;
+                    if (v > 1.0) {
+                        color = vec4(1.0, 0.0, 0.0, 1.0);
+                    } else {
+                        discard;
+                    }
+
+                    gl_FragColor = vec4(color.rgb, 1.0);
+                }
+            `;
+
+            const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+
+            const aPosition = gl.getAttribLocation(program, 'aPosition');
+            const metaBalls = gl.getUniformLocation(program, 'metaBalls');
+            
+            const points = new Float32Array([
+                -1.0, 1.0,
+                -1.0, -1.0,
+                1.0, 1.0,
+                1.0, -1.0,
+            ]);
+
+            let balls = [
+                {
+                    y: 180,
+                    speed: 0.5
+                },
+                {
+                    y: 300,
+                    speed: -0.5
+                }
+            ];
+
+            
+
+            const buffer = gl.createBuffer();
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, points, gl.STATIC_DRAW);
+            gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(aPosition);
+            // 执行绘制
+            // 需要绘制的图形是什么， 从哪个开始， 使用几个顶点
+            let time = 0;
+            function draw () {
+                time += 1;
+                let data = [];
+                for (let i = 0; i < balls.length; i++ ){
+                    balls[i].y += balls[i].speed;
+
+                    if (time % 100 === 0) {
+                        balls[i].speed = -balls[i].speed;
+                    }
+
+                    data.push(250, balls[i].y, 30)
+                }
+
+                gl.uniform3fv(metaBalls, new Float32Array(data));
+
+                gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+                requestAnimationFrame(draw);
+            }
+            draw();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title></title>
+        <script src="../lib/index.js"></script>
+    </head>
+    <body>
+        <canvas id="canvas" width="400" height="400">
+            此浏览器不支持canvas
+        </canvas>
+        
+        <script>
+            const ctx = document.getElementById('canvas');
+            const gl = ctx.getContext("webgl");
+
+            // 着色器
+            // 创建着色器源码
+            const VERTEX_SHADER_SOURCE = `
+                void main() {
+                    gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+                    gl_PointSize = 100.0;
+                }
+            `;
+            const FRAGMENT_SHADER_SOURCE = `
+                void main() {
+                    if (gl_PointCoord.y > 0.75) {
+                        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+                    } else if (gl_PointCoord.y > 0.5) {
+                        gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+                    } else if (gl_PointCoord.y > 0.25) {
+                        gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+                    } else {
+                        gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
+                    }
+                }
+            `;
+
+            const program = initShader(gl, VERTEX_SHADER_SOURCE, FRAGMENT_SHADER_SOURCE);
+
+        
+            // 执行绘制
+            // 需要绘制的图形是什么， 从哪个开始， 使用几个顶点
+            gl.drawArrays(gl.Points, 0, 1);
+        </script>
+    </body>
+</html>
