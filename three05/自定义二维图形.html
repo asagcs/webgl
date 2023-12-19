@@ -29,7 +29,6 @@
 import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
 import { createMultiMaterialObject } from '../lib/threejs/jsm/utils/SceneUtils.js';
 import * as THREE from '../lib/threejs/three.module.js';
-import { initControls } from '../lib/controls/index.js';
 
 
     // 创建一个场景
@@ -49,9 +48,16 @@ import { initControls } from '../lib/controls/index.js';
 
     document.body.appendChild(renderer.domElement);
 
-    // 添加一个立方体
-    // 定义一个立方体对象
-    const  geometry = new THREE.PlaneGeometry(10, 10, 2, 2);
+    // 添加一个图形
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.lineTo(0, 3);
+    shape.lineTo(4, 3);
+    shape.lineTo(3, 0);
+    shape.lineTo(0, 0);
+    
+    const geometry = new THREE.ShapeGeometry(shape);
+
     // 创建材质
     const lambert = new THREE.MeshLambertMaterial({ color: 0xff0000 });
     const basic = new THREE.MeshBasicMaterial({ wireframe: true })
@@ -72,8 +78,6 @@ import { initControls } from '../lib/controls/index.js';
 
     const lightHelper = new THREE.SpotLightHelper( spotLight );
 	scene.add( lightHelper );
-
-    initControls(geometry, camera, mesh, scene);
 
     function animation() {
         mesh.pointer.rotation.x += 0.01;

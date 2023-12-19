@@ -51,7 +51,7 @@ import { initControls } from '../lib/controls/index.js';
 
     // 添加一个立方体
     // 定义一个立方体对象
-    const  geometry = new THREE.PlaneGeometry(10, 10, 2, 2);
+    const  geometry = new THREE.CircleGeometry(4, 10, 0, Math.PI * 2);
     // 创建材质
     const lambert = new THREE.MeshLambertMaterial({ color: 0xff0000 });
     const basic = new THREE.MeshBasicMaterial({ wireframe: true })
