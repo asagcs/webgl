@@ -27,7 +27,7 @@
 </html>
 <script type="module">
 import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
-import * as THREE from '../lib/threejs/three.module.js'
+import * as THREE from '../lib/threejs/three.module.js';
 import { initControls } from '../lib/controls/index.js';
 
 
@@ -52,15 +52,19 @@ import { initControls } from '../lib/controls/index.js';
     // 定义一个立方体对象
     const  cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     // 创建材质
-    const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false,transparent: true });
+    // 改材质已被启用
+    const cubeMaterial = new THREE.MeshFaceMaterial([
+        new THREE.MeshBasicMaterial({ color: 0x009e60 }),
+        new THREE.MeshBasicMaterial({ color: 0x0051ba }),
+        new THREE.MeshBasicMaterial({ color: 0xffd500 }),
+        new THREE.MeshBasicMaterial({ color: 0xff5800 }),
+        new THREE.MeshBasicMaterial({ color: 0xc4133a }),
+        new THREE.MeshBasicMaterial({ color: 0xffffff }),
+    ]);
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
     // 添加到场景里
     scene.add(cube);
-
-
-    // 让两个三维物体产生阴影， 球体立方体， 使用平面接收阴影
-    cube.castShadow = true;
 
     // 添加灯光
     const spotLight = new THREE.SpotLight(0xffffff, 5000);
@@ -70,15 +74,7 @@ import { initControls } from '../lib/controls/index.js';
     const lightHelper = new THREE.SpotLightHelper( spotLight );
 	scene.add( lightHelper );
 
-    // 灯光开启 阴影效果
-    spotLight.castShadow = true;
-    renderer.shadowMap.enabled = true;
-    // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    spotLight.shadow.mapSize.width = 4096;
-    spotLight.shadow.mapSize.height = 4096;
-
-    initControls(cubeMaterial);
+    initControls(cubeMaterial, camera);
 
     function animation() {
         cube.rotation.x += 0.01;

@@ -52,7 +52,37 @@ import { initControls } from '../lib/controls/index.js';
     // 定义一个立方体对象
     const  cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     // 创建材质
-    const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false,transparent: true });
+    const cubeMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+            r: {
+                type: 'f',
+                value: 1.0
+            },
+            g: {
+                type: 'f',
+                value: 1.0
+            },
+            a: {
+                type: 'f',
+                value: 1.0
+            }
+        },
+        vertexShader: `
+            void main() {
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `,
+        fragmentShader: `
+            uniform float r;
+            uniform float g;
+            uniform float a;
+
+            void main () {
+                gl_FragColor = vec4(r, g, 0.0, a);
+            }
+        `,
+        transparent: true
+    });
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
     // 添加到场景里

@@ -27,7 +27,7 @@
 </html>
 <script type="module">
 import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
-import * as THREE from '../lib/threejs/three.module.js'
+import * as THREE from '../lib/threejs/three.module.js';
 import { initControls } from '../lib/controls/index.js';
 
 
@@ -48,20 +48,30 @@ import { initControls } from '../lib/controls/index.js';
 
     document.body.appendChild(renderer.domElement);
 
-    // 添加一个立方体
-    // 定义一个立方体对象
-    const  cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-    // 创建材质
-    const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false,transparent: true });
-    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    // 添加直线和虚线
+    const lines = new THREE.BufferGeometry();
+    const vertices = [
+        new THREE.Vector3(0, 2, 5),
+        new THREE.Vector3(0, -2, 5)
+    ]
 
-    // 添加到场景里
-    scene.add(cube);
+    lines.setFromPoints(vertices);
 
+    // const material = new THREE.LineBasicMaterial({
+    //     color: 0xff0000,
+    //     linewidth: 10,
+    // })
 
-    // 让两个三维物体产生阴影， 球体立方体， 使用平面接收阴影
-    cube.castShadow = true;
+    const material = new THREE.LineDashedMaterial({
+        color: 0xff0000,
+        dashSize: 1, // 短线长度
+        gapSize: 1 // 间隔长度
+    })
 
+    const line = new THREE.Line(lines, material);
+    line.computeLineDistances();
+
+    scene.add(line);
     // 添加灯光
     const spotLight = new THREE.SpotLight(0xffffff, 5000);
     spotLight.position.set(-10, 10, 30);
@@ -70,19 +80,9 @@ import { initControls } from '../lib/controls/index.js';
     const lightHelper = new THREE.SpotLightHelper( spotLight );
 	scene.add( lightHelper );
 
-    // 灯光开启 阴影效果
-    spotLight.castShadow = true;
-    renderer.shadowMap.enabled = true;
-    // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    spotLight.shadow.mapSize.width = 4096;
-    spotLight.shadow.mapSize.height = 4096;
-
-    initControls(cubeMaterial);
+    initControls(material, camera);
 
     function animation() {
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
         lightHelper.update();
         renderer.render(scene, camera);
         requestAnimationFrame(animation);

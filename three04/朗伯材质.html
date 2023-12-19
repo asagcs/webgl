@@ -52,15 +52,13 @@ import { initControls } from '../lib/controls/index.js';
     // 定义一个立方体对象
     const  cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
     // 创建材质
-    const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: false,transparent: true });
+    const cubeMaterial = new THREE.MeshLambertMaterial({
+        color: 0xff0000
+    });
     const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
 
     // 添加到场景里
     scene.add(cube);
-
-
-    // 让两个三维物体产生阴影， 球体立方体， 使用平面接收阴影
-    cube.castShadow = true;
 
     // 添加灯光
     const spotLight = new THREE.SpotLight(0xffffff, 5000);
@@ -70,15 +68,7 @@ import { initControls } from '../lib/controls/index.js';
     const lightHelper = new THREE.SpotLightHelper( spotLight );
 	scene.add( lightHelper );
 
-    // 灯光开启 阴影效果
-    spotLight.castShadow = true;
-    renderer.shadowMap.enabled = true;
-    // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-    spotLight.shadow.mapSize.width = 4096;
-    spotLight.shadow.mapSize.height = 4096;
-
-    initControls(cubeMaterial);
+    initControls(cubeMaterial, camera);
 
     function animation() {
         cube.rotation.x += 0.01;
