@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../lib/threejs/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
+<script type="module">
+import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
+import * as THREE from '../lib/threejs/three.module.js';
+import { MTLLoader } from '../lib/threejs/jsm/loaders/MTLLoader.js';
+import { OBJLoader } from '../lib/threejs/jsm/loaders/OBJLoader.js';
+import { TrackballControls } from "../lib/threejs/jsm/controls/TrackballControls.js";
+import { FirstPersonControls } from "../lib/threejs/jsm/controls/FirstPersonControls.js";
+import { FlyControls } from "../lib/threejs/jsm/controls/FlyControls.js";
+import { DragControls } from "../lib/threejs/jsm/controls/DragControls.js";
+
+    const clock = new THREE.Clock();
+
+    // 创建一个场景
+    const scene = new THREE.Scene();
+    // 创建一个相机，视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
+    // 设置相机位置
+    camera.position.set(100, 300, 400);
+    camera.lookAt(new THREE.Vector3(0,0,0));
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    // const controls = new TrackballControls( camera, renderer.domElement );
+    // const controls = new FirstPersonControls(camera, renderer.domElement);
+    // const controls = new FlyControls(camera, renderer.domElement);
+
+    // controls.rollSpeed = 0.5;
+
+    // const controls = new DragControls(camera, renderer.domElement);
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+	//controls.rotateSpeed = 1.0;
+	// controls.zoomSpeed = 1.2;
+	// controls.panSpeed = 0.8;
+	// controls.keys = [ 'KeyA', 'KeyS', 'KeyD' ];
+
+
+    document.body.appendChild(renderer.domElement);
+
+    let objLoader = new OBJLoader();
+    let mtlLoader = new MTLLoader();
+    mtlLoader.load('../assets/modules/city.mtl', function (materials) {
+        materials.preload();
+        objLoader.setMaterials(materials);
+        objLoader.load('../assets/modules/city.obj', function(obj) {
+            obj.scale.set(1, 1, 1);
+            scene.add(obj);
+        });
+    })
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff, 1);
+    spotLight.position.set(2000, 8000, 4000);
+    spotLight.decay = 0;
+    scene.add(spotLight);
+
+    const lightHelper = new THREE.SpotLightHelper( spotLight );
+	scene.add( lightHelper );
+
+    // initControls(cubeMaterial, camera);
+
+    function animation() {
+        controls.update(clock.getDelta());
+        lightHelper.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animation);
+        
+    }
+
+    animation();
+</script>
