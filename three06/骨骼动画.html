@@ -46,9 +46,10 @@ import * as THREE from '../lib/threejs/three.module.js';
 
     document.body.appendChild(renderer.domElement);
 
-    const geometry = new THREE.CylinderGeometry(2, 2, 40, 8, false);
+    const geometry = new THREE.CylinderGeometry(2, 2, 40, 8, 12, 5, 30);
     const materials = new THREE.MeshPhongMaterial();
-    const mesh = new THREE.Mesh(geometry, materials);
+    // 蒙皮---皮肤
+    const mesh = new THREE.SkinnedMesh(geometry, materials);
     scene.add(mesh)
 
     // 添加灯光
@@ -61,7 +62,7 @@ import * as THREE from '../lib/threejs/three.module.js';
 
     // 添加骨骼
     let b1 = new THREE.Bone();
-    b1.position.set(0, 20, 0);
+    b1.position.set(0, -20, 0);
 
     let b2 = new THREE.Bone();
     b1.add(b2);
@@ -80,10 +81,41 @@ import * as THREE from '../lib/threejs/three.module.js';
     b5.position.set(0, 10, 0);
 
     // 创建骨架
-    // THREE.Skeleton([])''
+    const skeleton = new THREE.Skeleton([b1, b2, b3, b4, b5]);
+    mesh.add(b1);
+    mesh.bind(skeleton);
 
+
+    // 添加权重   设置的就是蒙皮的权重，  顶点的蒙皮索引
+    const index = [] // 索引
+    const weight = [] // 权重
+
+    const arr = geometry.attributes.position.array;
+    for (let i = 0; i < arr.length; i += 3) {
+        const y = arr[i + 1] + 20
+
+        // const index = Math.floor(y / 10);
+        const weightValue = (y % 10) / 10
+
+        index.push(Math.floor(y / 10), Math.floor(y / 10) + 1, 0, 0)
+        weight.push(1 - weightValue, weightValue, 0, 0);
+    }
+
+    geometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(index, 4));
+    geometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(weight, 4));
+
+
+    const helper = new THREE.SkeletonHelper( mesh );
+    scene.add( helper );
+    
+    let step = 0.1;
 
     function animation() {
+
+        for (let i = 0; i < mesh.skeleton.bones.length; i++) {
+            mesh.skeleton.bones[i].rotation.z += step * Math.PI / 180;
+        }
+
         controls.update(clock.getDelta());
         renderer.render(scene, camera);
         requestAnimationFrame(animation);

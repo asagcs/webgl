@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凹凸贴图</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../lib/threejs/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
+    <script src="../lib/threejs/dat.gui.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
+<script type="module">
+import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
+import { createMultiMaterialObject } from '../lib/threejs/jsm/utils/SceneUtils.js';
+import * as THREE from '../lib/threejs/three.module.js';
+
+
+    // 创建一个场景
+    const scene = new THREE.Scene();
+    // 创建一个相机，视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 1000);
+    // 设置相机位置
+    camera.position.set(0, 0, 20);
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+    document.body.appendChild(renderer.domElement);
+
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff, 1, 0);
+    spotLight.position.set(-10, 10, 60);
+    spotLight.decay = 0;
+    scene.add(spotLight);
+
+    const imgs = [
+        "../assets/sky/right.jpg",
+        "../assets/sky/left.jpg",
+        "../assets/sky/top.jpg",
+        "../assets/sky/bottom.jpg",
+        "../assets/sky/front.jpg",
+        "../assets/sky/back.jpg",
+    ]
+
+    const loader = new THREE.TextureLoader();
+    const mats = [];
+    for (let i = 0; i < imgs.length; i++) {
+        loader.load(imgs[i], (texture) => {
+            // 创建材质
+            mats.push(new THREE.MeshBasicMaterial({ 
+                map: texture,
+                side: THREE.DoubleSide
+            }));
+           
+        });
+    }
+
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(200, 200, 200), mats);
+    scene.add(mesh);
+
+    // 创建两个物体
+    const sphereGeometry = new THREE.SphereGeometry(4, 15, 15);
+    const boxT = new THREE.BoxGeometry(5, 5, 5);
+
+    // 立方体贴图和环境一致
+    // 球体跟随环境
+    const cubeCamera = new THREE.CubeCamera(1, 2000, 
+        new THREE.WebGLCubeRenderTarget( 32, { 
+            generateMipmaps: true, 
+            minFilter: THREE.LinearMipmapLinearFilter
+        } )
+    );
+    scene.add(cubeCamera);
+
+    const sphereMaterial = new THREE.MeshBasicMaterial({
+        // color: 0xffffff,
+        envMap: cubeCamera.renderTarget.texture
+    })
+
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    const cube = new THREE.Mesh(boxT, mats);
+
+    sphere.position.x = 5;
+    cube.position.x = -5;
+    scene.add(sphere);
+    scene.add(cube);
+
+    function animation() {
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        // lightHelper.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animation);
+
+        cubeCamera.update(renderer, scene);
+    }
+    animation();
+</script>
