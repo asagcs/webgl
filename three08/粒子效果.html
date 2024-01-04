@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粒子效果</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../lib/threejs/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
+    <script src="../lib/threejs/dat.gui.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
+<script type="module">
+import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
+import { createMultiMaterialObject } from '../lib/threejs/jsm/utils/SceneUtils.js';
+import * as THREE from '../lib/threejs/three.module.js';
+
+
+    // 创建一个场景
+    const scene = new THREE.Scene();
+    // 创建一个相机，视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 10000);
+    // 设置相机位置
+    camera.position.set(10, 10, 200);
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xffffff);
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+    document.body.appendChild(renderer.domElement);
+
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff, 1, 0);
+    spotLight.position.set(-10, 10, 60);
+    spotLight.decay = 0;
+    scene.add(spotLight);
+
+    // 创建一个基础的粒子
+    function createNormalSprite() {
+        for(let i = -5; i < 5; i++) {
+            for(let j = -5; j < 5; j++) {
+                const material = new THREE.SpriteMaterial({
+                    color: Math.random() * 0xffffff
+                });
+
+                const sprite = new THREE.Sprite(material);
+                sprite.position.set(i * 10, j * 10, 0);
+                scene.add(sprite);
+            }
+        }
+    }
+
+    // 点云创建粒子
+    function createSystemSprite() {
+        const geometry = new THREE.BufferGeometry();
+        
+
+        let positions = [];
+        let colors = [];
+        let n = 1000, n2 = n / 2;
+        let color = new THREE.Color();
+        for (let i = 0; i < 126; i++) {
+
+            // 点
+            let x = Math.random() * n - n2;
+            let y = Math.random() * n - n2;
+            let z = Math.random() * n - n2;
+
+            positions.push(x, y, z);
+
+            // 颜色
+            let vx = (x / n) + 0.5;
+            let vy = (y / n) + 0.5;
+            let vz = (z / n) + 0.5;
+
+            color.setRGB(vx, vy, vz, THREE.SRGBColorSpace);
+
+            colors.push(color.r, color.g, color.b);
+        }
+        // 添加点和颜色
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+        console.log(geometry);
+        // geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        geometry.computeBoundingSphere();
+
+        const meterial = new THREE.PointsMaterial({
+            size: 30,
+            vertexColors: true,
+        })
+
+        const points = new THREE.Points(geometry, meterial);
+        scene.add(points);
+    }
+
+
+    createSystemSprite();
+
+    function animation() {
+
+        // lightHelper.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animation);
+    }
+    animation();
+</script>

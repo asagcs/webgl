@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粒子组成立方体</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "../lib/threejs/three.module.js",
+                "OrbitControls": "https://unpkg.com/three@0.138.0/examples/jsm/controls/OrbitControls.js"
+            }
+        }
+    </script>
+    <script src="../lib/tweenjs.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
+<script type="module">
+import { OrbitControls } from "../lib/threejs/jsm/controls/OrbitControls.js";
+import { createMultiMaterialObject } from '../lib/threejs/jsm/utils/SceneUtils.js';
+import * as THREE from '../lib/threejs/three.module.js';
+
+
+
+    // 创建一个场景
+    const scene = new THREE.Scene();
+    // 创建一个相机，视点
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 1, 10000);
+    // 设置相机位置
+    camera.position.set(10, 30, 100);
+
+    // 创建一个渲染器
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0xffffff);
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 1, 0 );
+				controls.update();
+
+    document.body.appendChild(renderer.domElement);
+
+
+    // 添加灯光
+    const spotLight = new THREE.SpotLight(0xffffff, 1, 0);
+    spotLight.position.set(-10, 10, 60);
+    spotLight.decay = 0;
+    scene.add(spotLight);
+
+    // 使用canvas贴图实现圆形
+    function getSprite() {
+        const canvas = document.createElement('canvas');
+        const size = 8;
+        canvas.width = size * 2;
+        canvas.height = size * 2;
+        const c = canvas.getContext('2d');
+
+        const gradient = c.createRadialGradient(size, size, 0, size, size, size);
+        gradient.addColorStop(0.1, 'rgba(0, 255, 255, 1)');
+        gradient.addColorStop(1, 'rgba(0, 0, 255, 1)');
+
+        c.fillStyle = gradient;
+        c.arc(size, size, size / 2, 0, Math.PI*2);
+        c.fill()
+
+        const texture = new THREE.Texture(canvas);
+        texture.needsUpdate = true;
+        return texture
+    }
+
+    // 创建一个立方体
+    const geometry = new THREE.BoxGeometry(10, 10, 10, 10, 10, 10);
+
+    // const pointsMaterial = new THREE.PointsMaterial({
+    //     size: 2,
+    //     // transparent: true,
+    //     // color: 0x9900f0,
+    //     map: getSprite()
+    // })
+
+    // const cloud = new THREE.Points(geometry, pointsMaterial);
+
+    // scene.add(cloud);
+
+    const range = 100;
+
+    const indexList = [];
+    const { Tween } = createjs;
+
+ function createPointCloud() {
+   const arr = geometry.attributes.position.array
+   console.log('我看一下', geometry)
+   for (let i = 0; i <  arr.length/3 ; i++) {
+     const i3 = i * 3
+     indexList.push({
+       x: arr[i3],
+       y: arr[i3+1],
+       z: arr[i3+2],
+     })
+
+     arr[i3] = Math.random() * range - range / 2;
+     arr[i3+1] = Math.random() * range - range / 2;
+     arr[i3+2] = Math.random() * range - range / 2;
+
+     const material = new THREE.SpriteMaterial({
+       map: getSprite(),
+     })
+     const sprite = new THREE.Sprite(material);
+     sprite.position.set(arr[i3], arr[i3+1], arr[i3+2]);
+     sprite.scale.set(1,1,1);
+     scene.add(sprite);
+   }
+
+   setTimeout(() => {
+     for (let i = 0; i < scene.children.length; i++) {
+       new Tween.get(scene.children[i].position).to(indexList[i], 2000);
+     }
+   }, 4000)
+ }
+
+ createPointCloud()
+
+    function animation() {
+
+        // lightHelper.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(animation);
+    }
+    animation();
+</script>
