@@ -99,7 +99,7 @@ import * as THREE from '../lib/threejs/three.module.js';
 
  function createPointCloud() {
    const arr = geometry.attributes.position.array
-   console.log('我看一下', geometry)
+   // console.log('我看一下', geometry)
    for (let i = 0; i <  arr.length/3 ; i++) {
      const i3 = i * 3
      indexList.push({
