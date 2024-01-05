@@ -3,6 +3,7 @@ import { SurrentLine } from '../effect/surrountLine';
 import { Background } from '../effect/background';
 import * as THREE from 'three';
 import * as Tween from '@tweenjs/tween.js'
+import { Radar } from '../effect/radar';
 
 export class City {
     constructor(scene, camera) {
@@ -11,6 +12,14 @@ export class City {
 
         this.tweenPosition = null;
         this.tweenRotation = null;
+
+        this.height = {
+            value: 5
+        }
+
+        this.time = {
+            value: 0
+        }
 
         this.loadCity();
     }
@@ -22,7 +31,7 @@ export class City {
             // this.scene.add(object);
             object.traverse((child) => {
                 if (child.isMesh) {
-                    new SurrentLine(this.scene, child);
+                    new SurrentLine(this.scene, child, this.height, this.time);
                 }
             });
 
@@ -32,7 +41,7 @@ export class City {
 
     initEffect () {
         new Background(this.scene);
-
+        new Radar(this.scene, this.time);
         this.addClick();
     }
 
@@ -98,10 +107,17 @@ export class City {
             }
     }
 
-    start() {
+    start(delta) {
         if (this.tweenPosition && this.tweenRotation) {
             this.tweenPosition.update();
             this.tweenRotation.update();
+        }
+
+        this.height.value += 0.4;
+        this.time.value += delta;
+
+        if (this.height.value > 90) {
+            this.height.value = 5;
         }
     }
 }

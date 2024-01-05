@@ -44,10 +44,11 @@ export const initCity = () => {
 
     const city = new City(scene, camera);
 
-    const start = () => {
+    const clock = new THREE.Clock();
 
+    const start = () => {
         controls.update();
-        city.start();
+        city.start(clock.getDelta());
         renderer.render(scene, camera)
         requestAnimationFrame(start);
     }
