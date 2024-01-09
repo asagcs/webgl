@@ -106,10 +106,10 @@ export class SurrentLine {
                 u_max: {
                     value: max
                 },
-                // 扫光的颜色
                 u_min: {
                     value: min
                 },
+                // 扫光的颜色
                 live_color: {
                     value: new THREE.Color(color.liveColor)
                 }

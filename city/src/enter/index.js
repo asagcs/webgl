@@ -67,4 +67,5 @@ export const initCity = () => {
         renderer.setPixelRatio(Math.min(Window.devicePixelRatio, 2));
     });
     
+    return city;
 }

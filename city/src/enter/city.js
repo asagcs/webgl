@@ -4,6 +4,14 @@ import { Background } from '../effect/background';
 import * as THREE from 'three';
 import * as Tween from '@tweenjs/tween.js'
 import { Radar } from '../effect/radar';
+import { wall } from '../effect/wall';
+import Circle from '../effect/circle';
+import Ball from '../effect/ball';
+import Cone from '../effect/cone';
+import Fly from '../effect/fly';
+import Road from '../effect/raod';
+import { Font } from '../effect/font';
+import { Snow } from '../effect/snow';
 
 export class City {
     constructor(scene, camera) {
@@ -13,6 +21,8 @@ export class City {
         this.tweenPosition = null;
         this.tweenRotation = null;
 
+        this.flag = false;
+
         this.height = {
             value: 5
         }
@@ -21,12 +31,20 @@ export class City {
             value: 0
         }
 
+        this.top = {
+            value: 0
+        }
+
+        this.effect = {}
+
+        this.snowFlag = false;
+
         this.loadCity();
     }
 
     loadCity () {
         // 加载模型，并渲染到画布上
-        loadFBX('/src/model/lzh.fbx').then(object => {
+        loadFBX('/src/model/lzh2.fbx').then(object => {
             // console.log('拿到数据了', object)
             // this.scene.add(object);
             object.traverse((child) => {
@@ -42,7 +60,25 @@ export class City {
     initEffect () {
         new Background(this.scene);
         new Radar(this.scene, this.time);
+        new wall(this.scene, this.time);
+        new Circle(this.scene, this.time);
+        new Ball(this.scene, this.time);
+        new Cone(this.scene, this.top, this.height);
+        new Fly(this.scene, this.time);
+        new Road(this.scene, this.time);
+        new Font(this.scene);
+        this.effect.snow = new Snow(this.scene);
+
         this.addClick();
+    }
+
+    startOrStopSnow () {
+        this.snowFlag = !this.snowFlag;
+        if (!this.snowFlag) {
+            this.effect.snow.stopAnimation();
+        } else {
+            this.effect.snow.startAnimation();
+        }
     }
 
     addClick() {
@@ -108,6 +144,14 @@ export class City {
     }
 
     start(delta) {
+
+        if (this.snowFlag) {
+            for(const key in this.effect) {
+                this.effect[key] && this.effect[key].animation();
+            }
+        }
+        
+
         if (this.tweenPosition && this.tweenRotation) {
             this.tweenPosition.update();
             this.tweenRotation.update();
@@ -119,5 +163,10 @@ export class City {
         if (this.height.value > 90) {
             this.height.value = 5;
         }
+
+        if (this.top.value > 15 || this.top.value < 0) {
+            this.flag = !this.flag;
+        }
+        this.top.value += (this.flag ? -0.8 : 0.8) ;
     }
 }

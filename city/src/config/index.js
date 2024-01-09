@@ -5,4 +5,9 @@ export const color = {
     risingColor: '#5588AA', // 扫描线颜色
     liveColor: '#ffffff' , // 城市扫描线颜色
     radarColor: '#ff8800', // 雷达扫描的颜色
+    wallColor: '#fab73f',
+    circleColor: '#00bbff',
+    ball: '#fab73f',
+    cone: '#ffff00',
+    fly: '#00bbff'
 }
