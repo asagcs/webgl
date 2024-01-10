@@ -1,9 +1,9 @@
 <template>
   <canvas id="webgl">浏览器不支持canvas， 请切换浏览器</canvas>
   <div class="buttonGroup">
-    <div class="buttonItem" @click.stop="toSnow">下雪</div>
-    <div class="buttonItem">下雨</div>
-    <div class="buttonItem">烟雾预警</div>
+    <div class="buttonItem" @click="toSnow">下雪</div>
+    <div class="buttonItem" @click="toRain">下雨</div>
+    <div class="buttonItem" @click="toSmoke">烟雾预警</div>
   </div>
 </template>
 
@@ -15,6 +15,14 @@ let cityAll = null;
 
 function toSnow () {
   cityAll.startOrStopSnow();
+}
+
+function toRain () {
+  cityAll.startOrStopRain();
+}
+
+function toSmoke () {
+  cityAll.startOrStopSmoke();
 }
 
 onMounted(() => {

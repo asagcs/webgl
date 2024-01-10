@@ -50,11 +50,13 @@ export class Snow {
         if (this.point) {
             this.scene.add(this.point);
         } else {
+           
             this.init();
         }
     }
 
     animation () {
+        if (!this.geometry || !this.pointList.length) return;
         // this.scene.remove(this.point)
         this.pointList.forEach(position => {
             position.x -= position.speedX;

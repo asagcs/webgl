@@ -23,6 +23,8 @@ export const initCity = () => {
     // 最近最远距离
     controls.minDistance = 100;
     controls.maxDistance = 6000;
+    // 开启右键拖动
+    controls.enablePan = true;
 
     scene.add(new THREE.AmbientLight(0xadadad));
     const directionLight = new THREE.DirectionalLight(0xffffff);
@@ -42,7 +44,7 @@ export const initCity = () => {
     // 设置场景颜色
     renderer.setClearColor(new THREE.Color(0x000000), 1);
 
-    const city = new City(scene, camera);
+    const city = new City(scene, camera, controls);
 
     const clock = new THREE.Clock();
 

@@ -42,14 +42,28 @@ export class SurrentLine {
                 },
                 u_size: {
                     value: size
-                }
+                },
+                u_time: this.time
             },
             vertexShader: `
+                uniform float u_time;
                 varying vec3 v_position;
 
                 void main() {
+                    float u_max = 4.0;
                     v_position = position;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+                    float rate = u_time / u_max * 2.0;
+
+                    // 边界条件
+                    if (rate > 1.0) {
+                        rate = 1.0;
+                    }
+
+                    float z = position.z * rate;
+                    // position.y += u_time;
+
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position.x, position.y, z, 1.0);
                 }
             
             `,
@@ -124,6 +138,16 @@ export class SurrentLine {
                 varying vec3 v_color;
 
                 void main () {
+                    float uMax = 4.0;
+
+                    float rate = u_time / uMax * 2.0;
+
+                    if (rate > 1.0) {
+                        rate = 1.0;
+                    }
+
+                    float z = position.z * rate;
+
                     float new_time = mod(u_time * 0.1, 1.0);
                     // 扫描的位子
                     float rangeY = mix(u_min.y, u_max.y, new_time);
@@ -139,7 +163,7 @@ export class SurrentLine {
                         v_color = line_color;
                     }
 
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(vec2(position), z, 1.0);
                 }
             `,
             fragmentShader: `

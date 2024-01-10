@@ -12,11 +12,14 @@ import Fly from '../effect/fly';
 import Road from '../effect/raod';
 import { Font } from '../effect/font';
 import { Snow } from '../effect/snow';
+import { Rain } from '../effect/rain';
+import Smoke from '../effect/smoke';
 
 export class City {
-    constructor(scene, camera) {
+    constructor(scene, camera, controls) {
         this.scene = scene;
         this.camera = camera;
+        this.controls = controls;
 
         this.tweenPosition = null;
         this.tweenRotation = null;
@@ -36,8 +39,6 @@ export class City {
         }
 
         this.effect = {}
-
-        this.snowFlag = false;
 
         this.loadCity();
     }
@@ -68,34 +69,92 @@ export class City {
         new Road(this.scene, this.time);
         new Font(this.scene);
         this.effect.snow = new Snow(this.scene);
+        this.effect.snowAnimation = false;
+        this.effect.rain = new Rain(this.scene);
+        this.effect.rainAnimation = false;
+        this.effect.smoke = new Smoke(this.scene);
+        this.effect.smokeAnimation = false;
 
         this.addClick();
+        // this.addWheel();
     }
 
     startOrStopSnow () {
-        this.snowFlag = !this.snowFlag;
-        if (!this.snowFlag) {
-            this.effect.snow.stopAnimation();
-        } else {
+        this.effect.snowAnimation = !this.effect.snowAnimation;
+        if (this.effect.snowAnimation) {
             this.effect.snow.startAnimation();
+        } else {
+            this.effect.snow.stopAnimation();
+        }
+    }
+
+    startOrStopRain () {
+        this.effect.rainAnimation = !this.effect.rainAnimation;
+        if (this.effect.rainAnimation) {
+            this.effect.rain.startAnimation();
+        } else {
+            this.effect.rain.stopAnimation();
+        }
+    }
+
+    startOrStopSmoke () {
+        this.effect.smokeAnimation = !this.effect.smokeAnimation;
+        if (this.effect.smokeAnimation) {
+            this.effect.smoke.startAnimation();
+        } else {
+            this.effect.smoke.stopAnimation();
+        }
+    }
+
+    // 让场景跟随鼠标缩放
+    addWheel () {
+        const body = document.body;
+        body.onmousewheel = (event) => {
+            const value = 100;
+            // 鼠标当前的坐标信息
+            const x = (event.clientX / window.innerWidth) * 2 - 1;
+            const y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            const vector = new THREE.Vector3(x, y, 0.5);
+            vector.unproject(this.camera);
+            vector.sub(this.camera.position).normalize();
+
+            if (event.wheelDelta > 0) {
+                this.camera.position.x += vector.x * value;
+                this.camera.position.y += vector.y * value;
+                this.camera.position.z += vector.z * value;
+
+                this.controls.target.x += vector.x * value;
+                this.controls.target.y += vector.y * value;
+                this.controls.target.z += vector.z * value;
+            } else {
+                this.camera.position.x -= vector.x * value;
+                this.camera.position.y -= vector.y * value;
+                this.camera.position.z -= vector.z * value;
+
+                this.controls.target.x -= vector.x * value;
+                this.controls.target.y -= vector.y * value;
+                this.controls.target.z -= vector.z * value;
+            }
         }
     }
 
     addClick() {
         let flag = true;
-        document.onmousedown = () => {
+        const dom = document.getElementById('webgl');
+        dom.onmousedown = () => {
             flag = true;
-            document.onmousemove = () => {
+            dom.onmousemove = () => {
                 flag = false;
             }
         }
 
-        document.onmouseup = (event) => {
+        dom.onmouseup = (event) => {
             if (flag) {
                 this.clickEvent(event)
             }
 
-            document.onmousemove = null;
+            dom.onmousemove = null;
         }
     }
 
@@ -145,12 +204,17 @@ export class City {
 
     start(delta) {
 
-        if (this.snowFlag) {
-            for(const key in this.effect) {
-                this.effect[key] && this.effect[key].animation();
-            }
+        if (this.effect.snowAnimation) {
+            this.effect.snow && this.effect.snow.animation();
+        }
+
+        if (this.effect.rainAnimation) {
+            this.effect.rain && this.effect.rain.animation();
         }
         
+        if (this.effect.smokeAnimation) {
+            this.effect.smoke && this.effect.smoke.animation();
+        }
 
         if (this.tweenPosition && this.tweenRotation) {
             this.tweenPosition.update();
