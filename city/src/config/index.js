@@ -9,5 +9,6 @@ export const color = {
     circleColor: '#00bbff',
     ball: '#fab73f',
     cone: '#ffff00',
-    fly: '#00bbff'
+    fly: '#00bbff',
+    river: '#00ff44'
 }

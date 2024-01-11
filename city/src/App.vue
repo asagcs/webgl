@@ -5,13 +5,32 @@
     <div class="buttonItem" @click="toRain">下雨</div>
     <div class="buttonItem" @click="toSmoke">烟雾预警</div>
   </div>
+  <div class="left_content">
+    <div class="left_content_item">
+      <div>
+        我点的是{{ objname }}
+      </div>
+    </div>
+    <div class="left_content_item">
+
+    </div>
+    <div class="left_content_item">
+
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { initCity } from './enter/index';
 
 let cityAll = null;
+
+const objname = ref('');
+
+function changeName (name) {
+  objname.value = name;
+}
 
 function toSnow () {
   cityAll.startOrStopSnow();
@@ -26,7 +45,7 @@ function toSmoke () {
 }
 
 onMounted(() => {
-  cityAll = initCity();
+  cityAll = initCity(changeName);
 });
 </script>
 
@@ -48,5 +67,22 @@ onMounted(() => {
   letter-spacing: 5px;
   text-align: center;
   border-bottom: 1px solid #3300ff;
+}
+
+.left_content {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 22vw;
+  height: calc(100vh - 70px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background-color: #3300ff99;
+  color: #fff;
+}
+
+.left_content_item {
+  flex: 1;
 }
 </style>

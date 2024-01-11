@@ -5,9 +5,9 @@ export class Snow {
         this.scene = scene;
 
         // 范围
-        this.range = 2000;
+        this.range = 5000;
         // 雪花的个数
-        this.count = 900;
+        this.count = 4500;
 
         this.pointList = [];
         

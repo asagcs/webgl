@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { City } from './city.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
-export const initCity = () => {
+export const initCity = (changeName) => {
     // 获取canvas元素
     const canvas = document.getElementById('webgl');
 
@@ -22,7 +22,7 @@ export const initCity = () => {
     controls.enableZoom = true;
     // 最近最远距离
     controls.minDistance = 100;
-    controls.maxDistance = 6000;
+    controls.maxDistance = 10000;
     // 开启右键拖动
     controls.enablePan = true;
 
@@ -44,7 +44,7 @@ export const initCity = () => {
     // 设置场景颜色
     renderer.setClearColor(new THREE.Color(0x000000), 1);
 
-    const city = new City(scene, camera, controls);
+    const city = new City(scene, camera, controls, changeName);
 
     const clock = new THREE.Clock();
 

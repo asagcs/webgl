@@ -16,10 +16,11 @@ import { Rain } from '../effect/rain';
 import Smoke from '../effect/smoke';
 
 export class City {
-    constructor(scene, camera, controls) {
+    constructor(scene, camera, controls, changeName) {
         this.scene = scene;
         this.camera = camera;
         this.controls = controls;
+        this.changeName = changeName;
 
         this.tweenPosition = null;
         this.tweenRotation = null;
@@ -45,10 +46,11 @@ export class City {
 
     loadCity () {
         // 加载模型，并渲染到画布上
-        loadFBX('/src/model/lzh2.fbx').then(object => {
+        loadFBX('/src/model/lzh.fbx').then(object => {
             // console.log('拿到数据了', object)
             // this.scene.add(object);
             object.traverse((child) => {
+                // console.log('我想看看每一项', child)
                 if (child.isMesh) {
                     new SurrentLine(this.scene, child, this.height, this.time);
                 }
@@ -76,7 +78,7 @@ export class City {
         this.effect.smokeAnimation = false;
 
         this.addClick();
-        // this.addWheel();
+        this.addWheel();
     }
 
     startOrStopSnow () {
@@ -181,12 +183,17 @@ export class City {
             if (intersects.length) {
                 point3d = intersects[0]
             }
+
+            
     
             if (point3d) {
                 // 开始动画修改观察点
                 const time = 1000;
 
                 const proportion = 2;
+
+                this.changeName(point3d.object.geometry.name)
+                console.log('我点中了什么', point3d)
 
                 this.tweenPosition = new Tween.Tween(this.camera.position).to({
                     x: point3d.point.x * proportion,
@@ -220,12 +227,14 @@ export class City {
             this.tweenPosition.update();
             this.tweenRotation.update();
         }
-
-        this.height.value += 0.4;
+        // 处理前的模型用0.4
+        this.height.value += 0.04;
         this.time.value += delta;
 
-        if (this.height.value > 90) {
-            this.height.value = 5;
+        // 处理前的模型最高80， 处理后的模型最高为7
+        // 因此初始最低值在处理前用5，处理后用0.1比较合适
+        if (this.height.value > 7) {
+            this.height.value = 0.1;
         }
 
         if (this.top.value > 15 || this.top.value < 0) {

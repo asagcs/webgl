@@ -8,9 +8,16 @@ export class SurrentLine {
         this.height = height;
         this.time = time;
 
-        this.createMesh();
-        // 创建外围线条
-        this.createLine();
+        if (child.name == '操场') {
+            this.createRiver('#009933');
+        } else if (child.name == "river"){
+            this.createRiver('#23b699');
+        }else {
+            this.createMesh();
+            // 创建外围线条
+            this.createLine();
+        }
+        
     }
 
     computedMesh () {
@@ -80,8 +87,8 @@ export class SurrentLine {
                     vec3 base_color = u_city_color;
                     base_color = mix(base_color, u_head_color, v_position.z / u_size);
 
-                    if (u_height > v_position.z && u_height < v_position.z + 6.0) {
-                        float f_index = (u_height - v_position.z) / 3.0;
+                    if (u_height > v_position.z && u_height < v_position.z + 0.1) {
+                        float f_index = (u_height - v_position.z) / 0.1;
                         base_color = mix(u_up_color, base_color, abs(f_index - 1.0));
                     }
 
@@ -97,6 +104,18 @@ export class SurrentLine {
         mesh.scale.copy(this.child.scale);
 
         this.scene.add(mesh)
+    }
+
+    createRiver (color) {
+        const material = new THREE.MeshBasicMaterial({ color });
+        const mesh = new THREE.Mesh(this.child.geometry, material);
+
+        // 让mesh 继承child的旋转，缩放，平移
+        mesh.position.copy(this.child.position);
+        mesh.rotation.copy(this.child.rotation);
+        mesh.scale.copy(this.child.scale);
+
+        this.scene.add(mesh);
     }
 
     createLine() {
@@ -153,8 +172,9 @@ export class SurrentLine {
                     float rangeY = mix(u_min.y, u_max.y, new_time);
 
                     // 当前区间内显示扫描光带
-                    if (rangeY < position.y && rangeY > position.y - 200.0) {
-                        float f_index = 1.0 - sin((position.y - rangeY) / 200.0 * 3.14);
+                    // 处理前模型的扫光带的宽度值最为合适的是： 200.0， 处理后用10.0比较合适
+                    if (rangeY < position.y && rangeY > position.y - 10.0) {
+                        float f_index = 1.0 - sin((position.y - rangeY) / 10.0 * 3.14);
                         float r = mix(live_color.r, line_color.r, f_index);
                         float g = mix(live_color.g, line_color.g, f_index);
                         float b = mix(live_color.b, line_color.b, f_index);
