@@ -11,7 +11,7 @@
         我点的是{{ objname }}
       </div>
     </div>
-    <div class="left_content_item">
+    <div class="left_content_item" ref="chartsWrapper">
 
     </div>
     <div class="left_content_item">
@@ -23,10 +23,12 @@
 <script setup>
 import { onMounted, ref } from 'vue';
 import { initCity } from './enter/index';
+import { initCharts } from './utils/creatCharts';
 
 let cityAll = null;
 
 const objname = ref('');
+const chartsWrapper = ref();
 
 function changeName (name) {
   objname.value = name;
@@ -46,6 +48,7 @@ function toSmoke () {
 
 onMounted(() => {
   cityAll = initCity(changeName);
+  initCharts(chartsWrapper.value)
 });
 </script>
 
