@@ -4,6 +4,7 @@
     <div class="buttonItem" @click="toSnow">下雪</div>
     <div class="buttonItem" @click="toRain">下雨</div>
     <div class="buttonItem" @click="toSmoke">烟雾预警</div>
+    <div class="buttonItem" @click="toInsertDom">插入元素</div>
   </div>
   <div class="left_content">
     <div class="left_content_item">
@@ -32,6 +33,10 @@ const chartsWrapper = ref();
 
 function changeName (name) {
   objname.value = name;
+}
+
+function toInsertDom () {
+  cityAll.loadTemperature();
 }
 
 function toSnow () {

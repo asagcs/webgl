@@ -14,6 +14,7 @@ import { Font } from '../effect/font';
 import { Snow } from '../effect/snow';
 import { Rain } from '../effect/rain';
 import Smoke from '../effect/smoke';
+import { Temperature } from '../effect/charts';
 
 export class City {
     constructor(scene, camera, controls, changeName) {
@@ -77,9 +78,34 @@ export class City {
         this.effect.smoke = new Smoke(this.scene);
         this.effect.smokeAnimation = false;
 
+        
         this.addClick();
         this.addWheel();
     }
+
+    loadTemperature () {
+        if (this.temperVisiable) {
+            this.temperVisiable = false;
+            this.scene.remove(this.temper);
+        } else {
+            Temperature({
+                height: 10,
+                position: {
+                    x: -400,
+                    y: 100,
+                    z: -600
+                }
+            }, this.scene, Math.floor(Math.random() * 80)).then((obj) => {
+                obj.geometry.dispose();
+                obj.material.dispose()
+                this.temper = obj;
+            });
+            this.temperVisiable = true;
+        }
+       
+    }
+
+
 
     startOrStopSnow () {
         this.effect.snowAnimation = !this.effect.snowAnimation;
